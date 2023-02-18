@@ -43,7 +43,6 @@ ON_TOP_MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware', ]
 THIRD_PARTY_MIDDLEWARE = []
 
 LOCAL_MIDDLEWARE = [
-    'base.middleware.AuthMiddleware',
     'base.middleware.RequestResponseLogMiddleware',
 ]
 

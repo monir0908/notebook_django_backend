@@ -18,6 +18,6 @@ from django.urls import path
 from backend.views import health_check
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin', admin.site.urls),
     path('', health_check),
 ]

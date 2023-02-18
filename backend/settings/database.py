@@ -1,8 +1,6 @@
 from backend.settings import DB_NAME, DB_USER, DB_PASS, DB_HOST, DB_PORT
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-# from pathlib import Path
-# BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 DATABASES = {
@@ -17,6 +15,11 @@ DATABASES = {
 }
 
 # To use sqlite3 database
+# --------------------------
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# from pathlib import Path
+# BASE_DIR = Path(__file__).resolve().parent.parent
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
