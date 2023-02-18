@@ -1,9 +1,11 @@
 from django.urls import path
 from .views import (
-    TokenObtainPairView,    
+    LoginView,
+    SignUpView,
 )
 
 urlpatterns = [
 
-    path('login', TokenObtainPairView.as_view(), name='token_obtain_pair'), # <--overridden view; see user.views 
+    path('login', LoginView.as_view(), name='token_obtain_pair'), # <--overridden view; see user.views 
+    path('signup', SignUpView.as_view()),
 ]

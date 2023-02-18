@@ -8,8 +8,7 @@ from rest_framework_simplejwt.serializers import (
 
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import status, exceptions
-
+from rest_framework import serializers, status, exceptions
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, TokenObtainSerializer):
@@ -99,3 +98,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, TokenObtainSeri
         data['is_superuser'] = self.user.is_superuser
         # data['groups'] = self.user.groups.values_list('name', flat=True) <--Encounter Error:  TypeError: Object of type QuerySet is not JSON serializable
         return data
+
+class UserSignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'mobile',
+            'password',
+        ]
+    

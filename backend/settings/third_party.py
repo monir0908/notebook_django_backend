@@ -2,9 +2,9 @@ from backend.settings import DEBUG
 from datetime import timedelta
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.DjangoModelPermissions',
-    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.DjangoModelPermissions',
+    # ),
     'DEFAULT_RENDERER_CLASSES': (
         'backend.renderers.DefaultRenderer',
     ),    
