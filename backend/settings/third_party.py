@@ -1,4 +1,5 @@
 from backend.settings import DEBUG
+from datetime import timedelta
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -6,10 +7,17 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'backend.renderers.DefaultRenderer',
+    ),    
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'base.pagination.CustomPagination',
     'PAGE_SIZE': 5,
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
+}
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('Bearer',),
+   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=6000),
 }
 
 if not DEBUG:
