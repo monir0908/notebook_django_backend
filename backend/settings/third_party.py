@@ -7,7 +7,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'backend.renderers.DefaultRenderer',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'base.helpers.CustomPagination',
+    'DEFAULT_PAGINATION_CLASS': 'base.pagination.CustomPagination',
     'PAGE_SIZE': 5,
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
 }

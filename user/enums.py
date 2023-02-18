@@ -2,10 +2,9 @@ from enum import Enum
 
 
 class GenderTypes(Enum):
-    NONE = 1
-    MALE = 2
-    FEMALE = 3
-    NOT_SET = 4
+    MALE = 1
+    FEMALE = 2
+    NOT_SET = 0
 
 
 class UserStatus(Enum):

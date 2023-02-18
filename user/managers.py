@@ -7,6 +7,7 @@ from time import time
 
 from django.contrib.auth.models import BaseUserManager
 from django.utils import timezone
+from base.helpers import generate_user_code
 
 
 class UserManager(BaseUserManager):
@@ -22,12 +23,13 @@ class UserManager(BaseUserManager):
             raise ValueError('Password is not provided')
         if not mobile:
             raise ValueError('Mobile number is required')
-        
+        user_code = generate_user_code()
         user = self.model(
             email=self.normalize_email(email),
             first_name = first_name,
             last_name = last_name,
             mobile = mobile,
+            user_code = user_code,
             **extra_fields
         )
         user.set_password(password)
