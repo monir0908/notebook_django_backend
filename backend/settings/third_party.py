@@ -5,7 +5,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissions',
     ),
     'DEFAULT_RENDERER_CLASSES': (
-        'backend.apis.renderers.DefaultRenderer',
+        'backend.renderers.DefaultRenderer',
     ),
     'DEFAULT_PAGINATION_CLASS': 'base.helpers.CustomPagination',
     'PAGE_SIZE': 5,
