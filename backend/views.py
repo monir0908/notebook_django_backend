@@ -9,7 +9,7 @@ from rest_framework import status
 @permission_classes([AllowAny])
 def health_check(request: Request) -> Response:
     data = {
-        'message': 'Notebook Backend',
+        'message': 'Your Backend',
         'method': request.method
     }
     return Response(data={'message': data}, status=status.HTTP_200_OK)
