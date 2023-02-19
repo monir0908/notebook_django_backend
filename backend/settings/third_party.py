@@ -12,7 +12,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'base.pagination.CustomPagination',
-    'PAGE_SIZE': 5,
+    'PAGE_SIZE': 10,
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
 }
 SIMPLE_JWT = {

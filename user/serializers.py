@@ -9,7 +9,7 @@ from rest_framework_simplejwt.serializers import (
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, status, exceptions
-
+from base.helpers import generate_user_code
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, TokenObtainSerializer):
     
@@ -109,4 +109,19 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             'mobile',
             'password',
         ]
+    def create(self, validated_data):
+        
+        user = self.Meta.model(**validated_data)
+
+        # Getting password from dictionary for hashing
+        password = validated_data.pop('password')
+        
+
+        user.set_password(password)
+        user.is_active = True
+        user.user_code = generate_user_code()    
+        
+        # Saving user model
+        user.save()       
+        return user
     

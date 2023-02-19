@@ -2,7 +2,6 @@ from typing import Union
 from rest_framework import pagination
 from rest_framework.response import Response
 
-
 class CustomPagination(pagination.PageNumberPagination):
     page_query_param = 'page'
     page_size_query_param = 'page_size'
@@ -24,7 +23,7 @@ class CustomPagination(pagination.PageNumberPagination):
             'meta_data': {
                 'count': self.page.paginator.count,
                 'page_size': self.get_page_size(self.request),
-                'next': self._get_next_page(),
+                'next': self.get_next_link(),
                 'previous': self._get_previous_page(),
             },
             'data': data

@@ -2,7 +2,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 STATUS_MESSAGES = {
-    200: 'Status OK',
+    200: 'OK',
     201: 'Created',
     204: 'Deleted',
     302: 'Found',
@@ -51,7 +51,7 @@ class DefaultRenderer(JSONRenderer):
                 if 'message' in data or 'meta_data' in data or 'data' in data:
                     response_data.update(data)
                 else:
-                    response_data['message'] = STATUS_MESSAGES[response.status_code]
+                    response_data['message'] = STATUS_MESSAGES[response.status_code] 
                     response_data['data'] = data
             else:
                 response_data = None

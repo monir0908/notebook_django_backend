@@ -17,6 +17,7 @@ class LoginView(TokenObtainPairView):
 class SignUpView(APIView):
     
     def post(self,request):
+        request.data['is_active'] = True
 
         serializer = UserSignUpSerializer(data = request.data)
 
@@ -31,7 +32,7 @@ class SignUpView(APIView):
             # )
             # send_email(user)
 
-            return JsonResponse(status=status.HTTP_201_CREATED, data={  
+            return JsonResponse(status=status.HTTP_201_CREATED, data={    
                 "success": True,
                 "message": "Registration successful!",
             })
