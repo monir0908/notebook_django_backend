@@ -19,6 +19,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
+        fields = '__all__'
         extra_fields = [
             'collection_title',
             'collection_key',
