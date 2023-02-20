@@ -5,6 +5,7 @@ User = get_user_model()
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, status, exceptions
 from .models import Collection
+from document.serializers import DocumentSerializer, CreateDocumentSerializer, DocumentTinySerializer
 
 
 class CreateCollectionSerializer(serializers.ModelSerializer):
@@ -12,13 +13,9 @@ class CreateCollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = '__all__'
 
-class CollectionListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Collection
-        fields = ['collection_title','collection_key']
-
 class CollectionSerializer(serializers.ModelSerializer):
+    documents = DocumentTinySerializer(many=True, read_only=True)
     class Meta:
         model = Collection
-        fields = '__all__'
+        fields = ['id','collection_title','collection_key','documents']
     

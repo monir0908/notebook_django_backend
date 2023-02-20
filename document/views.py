@@ -59,11 +59,6 @@ class DocumentCreateView(APIView):
             })
 
 # DOCUMENT RETRIEVAL
-class DocumentDetailView(RetrieveAPIView):
-    queryset = Document.objects.all()
-    serializer_class = DocumentSerializer
-    lookup_url_kwarg = "pk"
-
 class DocumentListView(ListAPIView):
 
     serializer_class = DocumentSerializer
@@ -87,3 +82,8 @@ class DocumentListView(ListAPIView):
             queryset = queryset.filter(collection = collection_id) 
 
         return queryset
+class DocumentDetailView(RetrieveAPIView):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+    # lookup_url_kwarg = "pk"
+    lookup_field = 'doc_key'

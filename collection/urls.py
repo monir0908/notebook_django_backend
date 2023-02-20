@@ -8,5 +8,5 @@ from .views import (
 urlpatterns = [
     path('create', CreateCollectionView.as_view()),
     path('list', CollectionListView.as_view()),
-    path('<int:pk>', CollectionDetailView.as_view()),
+    path('<str:collection_key>', CollectionDetailView.as_view()),
 ]

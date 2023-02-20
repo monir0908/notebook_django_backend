@@ -10,7 +10,7 @@ from collection.models import Collection
 
 class Document(BaseModel):
     collection = models.ForeignKey(
-        Collection, models.CASCADE, blank=True, null=True
+        Collection, models.CASCADE, blank=True, null=True, related_name='documents'
     )       
     doc_creator = models.ForeignKey(
         User, models.DO_NOTHING, blank=True, null=True

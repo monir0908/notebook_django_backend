@@ -12,7 +12,6 @@ from django.db.models.functions import Concat
 
 from .serializers import (    
     CreateCollectionSerializer,
-    CollectionListSerializer,
     CollectionSerializer,
 )
 from base.permissions import (
@@ -53,12 +52,11 @@ class CreateCollectionView(APIView):
 # COLLECTION RETRIEVAL
 class CollectionListView(ListAPIView):
 
-    serializer_class = CollectionListSerializer
+    serializer_class = CollectionSerializer
     pagination_class = CustomPagination    
 
     def get_queryset(self):       
 
-        # queryset =  BillItems.objects.all().order_by('id')    
         queryset =  Collection.objects.order_by('id')    
         
         search_param = self.request.query_params.get('search_param', None)
@@ -77,6 +75,7 @@ class CollectionListView(ListAPIView):
 class CollectionDetailView(RetrieveAPIView):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
-    lookup_url_kwarg = "pk"
+    # lookup_url_kwarg = "pk"
+    lookup_field = 'collection_key'
 
 
