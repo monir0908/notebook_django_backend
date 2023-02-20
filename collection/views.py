@@ -13,6 +13,7 @@ from django.db.models.functions import Concat
 from .serializers import (    
     CreateCollectionSerializer,
     CollectionSerializer,
+    CollectionTinySerializer,
 )
 from base.permissions import (
     IsActiveMember, 
@@ -80,4 +81,17 @@ class CollectionDetailView(RetrieveAPIView):
     # lookup_url_kwarg = "pk"
     lookup_field = 'collection_key'
 
+class UpdateCollectionView(UpdateAPIView): 
+    queryset = Collection.objects.all()
+    serializer_class = CollectionTinySerializer
+    lookup_field = 'collection_key'
+    permission_classes = (IsCollectionOwner, )
+
+    def patch(self, request, *args, **kwargs):         
+        super(UpdateCollectionView, self).patch(request, *args, **kwargs)
+        return JsonResponse(status=status.HTTP_200_OK, data={
+            "sucess": True,
+            "warning": False,
+            "message": "Collection updated...",
+        })
 

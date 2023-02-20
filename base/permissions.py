@@ -56,7 +56,11 @@ class IsDocumentOwnerOrPublishedOrArchived(BasePermission):
         elif obj.doc_creator.id == request.user.id:
             return True
         elif obj.doc_status != DocumentStatus.PUBLISHED.value or obj.doc_status != DocumentStatus.ARCHIVED.value:
-            self.message = f"Oops! {request.user.first_name} - the owner has {action} the document."
+            if action == 'deleted':
+                self.message = f"The document is no longer accessible, the owner has {action} the document."
+            else:
+                self.message = f"The owner has restricted the access."
+                
             return False
         else:
             return False

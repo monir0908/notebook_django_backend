@@ -20,14 +20,16 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = [
+            'id',
             'doc_key',
             'doc_title',
-            'created_at',
-            'updated_at',
+            'doc_body',
+            'doc_creator_full_name',
             'doc_status',
+            'created_at',
+            'updated_at',            
             'collection_title',
             'collection_key',
-            'doc_creator_full_name',
         ]
 
 class DocumentTinySerializer(serializers.ModelSerializer):
@@ -36,6 +38,7 @@ class DocumentTinySerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'doc_title',
+            'doc_body',
             'doc_key',
             'doc_status',
         ]

@@ -26,4 +26,13 @@ class CollectionSerializer(serializers.ModelSerializer):
             'collection_creator_full_name',
             'documents'
         ]
+
+class CollectionTinySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = [
+            'id',
+            'collection_title',
+            'collection_key',
+        ]
     

@@ -38,15 +38,22 @@ class DocumentCreateView(APIView):
     
     def post(self,request):
 
-        key = "collection"
+        prop = "collection"
 
-        if not key in request.data.keys():
+        if not prop in request.data.keys():
             print("collection id is missing; provide collection key!") 
             return JsonResponse(status=status.HTTP_422_UNPROCESSABLE_ENTITY, data={   
                 "warning": True,
                 "success": False,
+                "message": "collection property is missing; provide collection property!"
+            }) 
+        if request.data['collection'] is None:
+            return JsonResponse(status=status.HTTP_422_UNPROCESSABLE_ENTITY, data={   
+                "warning": True,
+                "success": False,
                 "message": "collection id is missing; provide collection id!"
-            })        
+            }) 
+
 
         request.data['doc_title'] = "Untitled"
         request.data['doc_creator'] = self.request.user.id
@@ -136,7 +143,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
         })
 class UpdateDocumentView(UpdateAPIView): 
     queryset = Document.objects.all()
-    serializer_class = CreateDocumentSerializer
+    serializer_class = DocumentTinySerializer
     lookup_field = 'doc_key'
     permission_classes = (IsDocumentOwner, )
 
@@ -145,5 +152,5 @@ class UpdateDocumentView(UpdateAPIView):
         return JsonResponse(status=status.HTTP_200_OK, data={
             "sucess": True,
             "warning": False,
-            "message": "Document updated..",
+            "message": "Document updated...",
         })
