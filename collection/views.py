@@ -18,6 +18,7 @@ from base.permissions import (
     IsActiveMember, 
     IsStaff, 
     IsSuperUser,
+    IsCollectionOwner,
 )
 from rest_framework.generics import (
     ListAPIView,
@@ -75,6 +76,7 @@ class CollectionListView(ListAPIView):
 class CollectionDetailView(RetrieveAPIView):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
+    permission_classes = [IsCollectionOwner,]
     # lookup_url_kwarg = "pk"
     lookup_field = 'collection_key'
 

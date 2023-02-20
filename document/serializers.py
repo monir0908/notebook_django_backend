@@ -24,6 +24,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             'doc_title',
             'created_at',
             'updated_at',
+            'doc_status',
             'collection_title',
             'collection_key',
             'doc_creator_full_name',
@@ -36,5 +37,6 @@ class DocumentTinySerializer(serializers.ModelSerializer):
             'id',
             'doc_title',
             'doc_key',
+            'doc_status',
         ]
     

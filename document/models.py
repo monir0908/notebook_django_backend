@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model 
 User = get_user_model()
 from collection.models import Collection
+from base.enums import DocumentStatus
 
 # document related
 
@@ -23,6 +24,10 @@ class Document(BaseModel):
     )
     doc_title = models.CharField(max_length=50,  blank=True, null=True, default=None)
     doc_body = models.TextField(blank=True, null=True, default=None)
+    doc_status = models.IntegerField(
+        choices=[(tag.value, _(tag.name)) for tag in DocumentStatus],
+        default=DocumentStatus.DRAFTED.value
+    )
 
     class Meta:
         db_table = 'user_document'

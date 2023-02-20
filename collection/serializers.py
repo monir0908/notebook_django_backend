@@ -15,7 +15,15 @@ class CreateCollectionSerializer(serializers.ModelSerializer):
 
 class CollectionSerializer(serializers.ModelSerializer):
     documents = DocumentTinySerializer(many=True, read_only=True)
+    collection_creator_full_name = serializers.CharField(source='collection_creator.get_full_name', read_only=True)
+
     class Meta:
         model = Collection
-        fields = ['id','collection_title','collection_key','documents']
+        fields = [
+            'id',
+            'collection_title',
+            'collection_key',
+            'collection_creator_full_name',
+            'documents'
+        ]
     
