@@ -119,7 +119,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
         
         if existing_obj.doc_status == request.data['doc_status']: # checking sent status and exiting status is same.
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
-                "sucess":False,
+                "success":False,
                 "warning":True,
                 "message":"Apparently, the status is same. Action is aborted.",
             })
@@ -138,7 +138,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
 
         super(UpdateDocumentStatusView, self).patch(request, *args, **kwargs)
         return JsonResponse(status=status.HTTP_200_OK, data={
-            "sucess": True,
+            "success": True,
             "warning": False,
             "message": f"Your document has been {action}.",
         })
@@ -151,7 +151,7 @@ class UpdateDocumentView(UpdateAPIView):
     def patch(self, request, *args, **kwargs):         
         super(UpdateDocumentView, self).patch(request, *args, **kwargs)
         return JsonResponse(status=status.HTTP_200_OK, data={
-            "sucess": True,
+            "success": True,
             "warning": False,
             "message": "Document updated...",
         })

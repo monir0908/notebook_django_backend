@@ -90,7 +90,7 @@ class UpdateCollectionView(UpdateAPIView):
     def patch(self, request, *args, **kwargs):         
         super(UpdateCollectionView, self).patch(request, *args, **kwargs)
         return JsonResponse(status=status.HTTP_200_OK, data={
-            "sucess": True,
+            "success": True,
             "warning": False,
             "message": "Collection updated...",
         })
