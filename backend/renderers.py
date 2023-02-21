@@ -41,7 +41,6 @@ STATUS_MESSAGES = {
     511: 'Network Authentication Required'
 }
 
-
 class DefaultRenderer(JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         response: Response = renderer_context['response']
