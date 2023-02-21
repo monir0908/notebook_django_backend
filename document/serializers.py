@@ -37,9 +37,24 @@ class DocumentTinySerializer(serializers.ModelSerializer):
         model = Document
         fields = [
             'id',
+            'doc_key',
             'doc_title',
             'doc_body',
-            'doc_key',
             'doc_status',
+        ]
+
+class DocumentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = [
+            'id',
+            'doc_key',
+            'doc_title',
+            'doc_body',
+            'doc_status',
+        ]
+        read_only_fields=[
+            'id',
+            'doc_key',
         ]
     

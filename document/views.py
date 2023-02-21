@@ -14,6 +14,7 @@ from django.db.models.functions import Concat
 
 from .serializers import (    
     CreateDocumentSerializer,
+    DocumentUpdateSerializer,
     DocumentTinySerializer,
     DocumentSerializer,
 )
@@ -143,7 +144,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
         })
 class UpdateDocumentView(UpdateAPIView): 
     queryset = Document.objects.all()
-    serializer_class = DocumentTinySerializer
+    serializer_class = DocumentUpdateSerializer
     lookup_field = 'doc_key'
     permission_classes = (IsDocumentOwner, )
 
