@@ -34,5 +34,6 @@ class SignUpView(APIView):
 
             return JsonResponse(status=status.HTTP_201_CREATED, data={    
                 "success": True,
+                "state": "success",
                 "message": "Registration successful!",
             })

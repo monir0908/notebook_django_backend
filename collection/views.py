@@ -46,6 +46,7 @@ class CreateCollectionView(APIView):
 
             return JsonResponse(status=status.HTTP_201_CREATED, data={  
                 "success": True,
+                "state": "success",
                 "message": "Collection created successfully!",
                 "data": serializer.data
             })
@@ -92,6 +93,7 @@ class UpdateCollectionView(UpdateAPIView):
         return JsonResponse(status=status.HTTP_200_OK, data={
             "success": True,
             "warning": False,
+            "state": "success",
             "message": "Collection updated...",
         })
 

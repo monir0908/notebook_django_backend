@@ -46,12 +46,14 @@ class DocumentCreateView(APIView):
             return JsonResponse(status=status.HTTP_422_UNPROCESSABLE_ENTITY, data={   
                 "warning": True,
                 "success": False,
+                "state": "warning",
                 "message": "collection property is missing; provide collection property!"
             }) 
         if request.data['collection'] is None:
             return JsonResponse(status=status.HTTP_422_UNPROCESSABLE_ENTITY, data={   
                 "warning": True,
                 "success": False,
+                "state": "warning",
                 "message": "collection id is missing; provide collection id!"
             }) 
 
@@ -121,6 +123,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
                 "success":False,
                 "warning":True,
+                "state": "warning",
                 "message":"Apparently, the status is same. Action is aborted.",
             })
         
@@ -140,6 +143,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
         return JsonResponse(status=status.HTTP_200_OK, data={
             "success": True,
             "warning": False,
+            "state": "success",
             "message": f"Your document has been {action}.",
         })
 class UpdateDocumentView(UpdateAPIView): 
@@ -153,5 +157,6 @@ class UpdateDocumentView(UpdateAPIView):
         return JsonResponse(status=status.HTTP_200_OK, data={
             "success": True,
             "warning": False,
+            "state": "success",
             "message": "Document updated...",
         })
