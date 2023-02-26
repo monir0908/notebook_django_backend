@@ -69,6 +69,7 @@ class DocumentCreateView(APIView):
 
             return JsonResponse(status=status.HTTP_201_CREATED, data={    
                 "success": True,
+                "state": "success",
                 "message": "Document created successfully!",
                 "data": serializer.data
             })
