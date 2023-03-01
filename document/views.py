@@ -91,12 +91,17 @@ class DocumentListView(ListAPIView):
                 Q(doc_title__icontains=search_param) |
                 Q(doc_body__icontains=search_param) 
             )
-        # 1. FILTERING WITH 'collection_id'
+        
         collection_id = self.request.query_params.get('collection_id', None) 
         if collection_id is not None:          
-            queryset = queryset.filter(collection = collection_id)         
+            queryset = queryset.filter(collection = collection_id)   
 
-        # 2. FILTERING WITH DOCUMENT STATUS
+  
+        collection_key = self.request.query_params.get('collection_key', None) 
+        if collection_key is not None:          
+            queryset = queryset.filter(collection_key = collection_key)         
+
+     
         doc_status = self.request.query_params.get('doc_status', None)         
         if doc_status is not None:
             queryset = queryset.filter(doc_status= doc_status)
