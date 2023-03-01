@@ -35,7 +35,8 @@ class CreateCollectionView(APIView):
     
     def post(self,request):
 
-        request.data['collection_title'] = "Untitled"
+        if request.data['collection_title'] is None:
+            request.data['collection_title'] = "Untitled"
         request.data['collection_creator'] = self.request.user.id
 
         serializer = CreateCollectionSerializer(data = request.data)
