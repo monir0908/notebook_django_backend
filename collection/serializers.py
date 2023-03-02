@@ -41,7 +41,7 @@ class CollectionSerializer(serializers.ModelSerializer):
     
     # if children to be picked up under condition
     def get_documents(self, obj):
-        queryset = Document.objects.filter(~Q(doc_status = DocumentStatus.DELETED.value))
+        queryset = Document.objects.filter(~Q(doc_status = DocumentStatus.DELETED.value), collection__pk = obj.pk)
         return  DocumentTinySerializer(queryset, many=True).data
 
 class CollectionTinySerializer(serializers.ModelSerializer):
