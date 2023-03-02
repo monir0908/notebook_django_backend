@@ -29,6 +29,7 @@ from rest_framework.generics import (
     ListAPIView,
     RetrieveAPIView,
     UpdateAPIView,
+    DestroyAPIView,
 )
 
 
@@ -165,4 +166,22 @@ class UpdateDocumentView(UpdateAPIView):
             "warning": False,
             "state": "success",
             "message": "Document updated...",
+        })
+    
+# DOCUMENT DELETE
+class DeleteDocumentView(DestroyAPIView):
+
+    # this api is used, in case of deleting from database; 
+    # normally deleteion only updates status; see 'UpdateDocumentStatusView'
+
+
+    serializer_class = DocumentSerializer
+    queryset = Document.objects.all()
+    # permission_classes = (IsDocumentOwner, )
+
+    def delete(self, request, *args, **kwargs):
+        super(DeleteDocumentView, self).delete(request, *args, **kwargs)
+        return JsonResponse(status=status.HTTP_204_NO_CONTENT, data={
+            "state": "success",
+            "message": "Document deleted...",
         })

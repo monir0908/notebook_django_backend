@@ -25,6 +25,7 @@ from rest_framework.generics import (
     ListAPIView,
     RetrieveAPIView,
     UpdateAPIView,
+    DestroyAPIView,
 )
 
 
@@ -82,7 +83,6 @@ class CollectionDetailView(RetrieveAPIView):
     permission_classes = [IsCollectionOwner,]
     # lookup_url_kwarg = "pk"
     lookup_field = 'collection_key'
-
 class UpdateCollectionView(UpdateAPIView): 
     queryset = Collection.objects.all()
     serializer_class = CollectionTinySerializer
@@ -98,3 +98,17 @@ class UpdateCollectionView(UpdateAPIView):
             "message": "Collection updated...",
         })
 
+
+# COLLECTION DELETE
+class DeleteCollectionView(DestroyAPIView):
+
+    serializer_class = CollectionSerializer
+    queryset = Collection.objects.all()
+    # permission_classes = (IsCollectionOwner, )
+
+    def delete(self, request, *args, **kwargs):
+        super(DeleteCollectionView, self).delete(request, *args, **kwargs)
+        return JsonResponse(status=status.HTTP_204_NO_CONTENT, data={
+            "state": "success",
+            "message": "Collection and its all children deleted...",
+        })
