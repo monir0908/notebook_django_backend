@@ -95,7 +95,7 @@ class DocumentListView(ListAPIView):
 
         creator_id = self.request.query_params.get('creator_id', None)         
         if creator_id is not None:
-            queryset = queryset.filter(creator= creator_id)
+            queryset = queryset.filter(doc_creator = creator_id)
         
         collection_id = self.request.query_params.get('collection_id', None) 
         if collection_id is not None:          
