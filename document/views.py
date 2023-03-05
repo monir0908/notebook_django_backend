@@ -32,6 +32,8 @@ from rest_framework.generics import (
     DestroyAPIView,
 )
 
+import datetime
+date = datetime.date.today()
 
 # DOCUMENT CREATION
 class DocumentCreateView(APIView):
@@ -82,18 +84,19 @@ class DocumentListView(ListAPIView):
     pagination_class = CustomPagination    
 
     def get_queryset(self):       
-
-        # queryset =  BillItems.objects.all().order_by('id')    
         queryset =  Document.objects.order_by('id')    
         
         search_param = self.request.query_params.get('search_param', None)
-        if search_param is not None:            
-            queryset.filter(
-                Q(doc_title__icontains=search_param) |
-                Q(doc_body__icontains=search_param) 
-            )
+        creator_id = self.request.query_params.get('creator_id', None)    
 
-        creator_id = self.request.query_params.get('creator_id', None)         
+        if search_param is not None and creator_id is not None:            
+            queryset = queryset.filter(
+                Q(doc_title__icontains=search_param) |
+                Q(doc_body__icontains=search_param),
+                Q(doc_creator = creator_id)
+            )
+        
+     
         if creator_id is not None:
             queryset = queryset.filter(doc_creator = creator_id)
         
@@ -111,7 +114,35 @@ class DocumentListView(ListAPIView):
         if doc_status is not None:
             queryset = queryset.filter(doc_status= doc_status)
 
+
+        # FILTERING WITH DATE-RANGE - NEED TO REWRITE FOR OPTIMIZATION
+        date_range_str = self.request.query_params.get('date_range_str', None)
+
+        if date_range_str == 'yesterday':
+            yesterday = datetime.date.today() - datetime.timedelta(days=1)
+            queryset = queryset.filter(updated_at__date=yesterday)
+        
+        if date_range_str == 'week':
+            start = date - datetime.timedelta(date.wee)
+            end = start + datetime.timedelta(7)
+            queryset = queryset.filter(updated_at__range=[start, end])
+
+        if date_range_str == 'month':
+            start = datetime.date.today() - datetime.timedelta(days=30)
+            end = datetime.date.today() 
+            queryset.filter(updated_at__range=[start, end])
+        
+        if date_range_str == 'year':
+            start = datetime.date.today() - datetime.timedelta(days=365)
+            end = datetime.date.today() 
+            queryset.filter(updated_at__range=[start, end])
+
+
         return queryset
+    
+
+
+
 class DocumentDetailView(RetrieveAPIView):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
