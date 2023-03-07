@@ -32,8 +32,13 @@ from rest_framework.generics import (
     DestroyAPIView,
 )
 
+
+# from system utils
 import datetime
 date = datetime.date.today()
+
+from django.utils import timezone
+now = timezone.now()
 
 # DOCUMENT CREATION
 class DocumentCreateView(APIView):
@@ -84,7 +89,16 @@ class DocumentListView(ListAPIView):
     pagination_class = CustomPagination    
 
     def get_queryset(self):       
-        queryset =  Document.objects.order_by('id')    
+
+        order_by_query_param = self.request.query_params.get('order_by', None)
+
+        date_range_str = self.request.query_params.get('date_range_str', None)
+        
+
+        if order_by_query_param is not None:
+            queryset =  Document.objects.order_by(order_by_query_param)    
+        else:
+            queryset =  Document.objects.order_by('-id')  
         
         search_param = self.request.query_params.get('search_param', None)
         creator_id = self.request.query_params.get('creator_id', None)    
@@ -116,14 +130,14 @@ class DocumentListView(ListAPIView):
 
 
         # FILTERING WITH DATE-RANGE - NEED TO REWRITE FOR OPTIMIZATION
-        date_range_str = self.request.query_params.get('date_range_str', None)
+        
 
         if date_range_str == 'yesterday':
             yesterday = datetime.date.today() - datetime.timedelta(days=1)
             queryset = queryset.filter(updated_at__date=yesterday)
         
         if date_range_str == 'week':
-            start = date - datetime.timedelta(date.wee)
+            start = datetime.date.today() - datetime.timedelta(days=7)
             end = start + datetime.timedelta(7)
             queryset = queryset.filter(updated_at__range=[start, end])
 
@@ -174,6 +188,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
             action = 'drafted'
         elif request.data['doc_status'] == DocumentStatus.PUBLISHED.value:
             action = 'published'
+            request.data['published_at'] = now
         elif request.data['doc_status'] == DocumentStatus.DELETED.value:
             action = 'deleted'
         elif request.data['doc_status'] == DocumentStatus.ARCHIVED.value:

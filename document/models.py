@@ -29,6 +29,8 @@ class Document(BaseModel):
         default=DocumentStatus.DRAFTED.value
     )
 
+    published_at = models.DateTimeField( blank=True, null=True)
+
     class Meta:
         db_table = 'user_document'
         ordering = ['id']
