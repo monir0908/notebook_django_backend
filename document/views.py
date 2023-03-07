@@ -124,13 +124,12 @@ class DocumentListView(ListAPIView):
             queryset = queryset.filter(collection_key = collection_key)         
 
      
-        doc_status = self.request.query_params.get('doc_status', None)         
-        if doc_status is not None:
-            queryset = queryset.filter(doc_status= doc_status)
+        doc_status = self.request.query_params.getlist('doc_status', [])        # using getlist() in case of multiple 'doc_status' request 
+        if len(doc_status) > 0:
+            queryset = queryset.filter(doc_status__in= doc_status)                # using 'doc_status__in' assuming multiple 'doc_status' request  
 
 
-        # FILTERING WITH DATE-RANGE - NEED TO REWRITE FOR OPTIMIZATION
-        
+        # FILTERING WITH DATE-RANGE - NEED TO REWRITE FOR OPTIMIZATION        
 
         if date_range_str == 'yesterday':
             yesterday = datetime.date.today() - datetime.timedelta(days=1)
