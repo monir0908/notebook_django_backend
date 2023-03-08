@@ -1,0 +1,173 @@
+# 01 
+To iterate queryset
+----------------------
+
+for i in payment_queryset:
+    print(i.payment_method)
+
+
+#02 
+To iterate serialized data:
+------------------------------
+
+for i in serializer.data:
+    print(i['payment_method'])
+
+
+
+# 03 
+To check a key is missing or not in request body
+---------------------------------------------------
+
+data = request.data
+my_key = "billing_month"
+
+if not my_key in data.keys():
+    print("key is missing") # my_key is billing_month 
+
+
+# 04 
+Tenary operator (multiple)
+---------------------------------
+
+return 'wholesaler' if self.is_wholesaler is True else 'retailer' if self.is_retailer is True else 'n/a'
+
+# 05 
+To pull select_related fields
+---------------------------------
+    approach 01
+    -----------
+    customer_code = serializers.CharField(source='customer.customer_code', read_only=True)
+    class Meta:
+        model = Bill
+        fields = [
+
+            # regular fields
+            'id',
+            'bill_no',
+
+            # joining fields
+            'customer_code',
+        ]
+    approach 02
+    -----------
+    customer_code = serializers.CharField(source='customer.customer_code', read_only=True)
+    class Meta:
+        model = Payment
+        fields = '__all__'
+        extra_fields = [
+            'customer_code',
+        ]
+
+
+# 06
+Save a model
+---------------------------------
+    approach 01
+    -----------
+    new_bill_item = BillItems(
+            bill_no = 'xxxx'
+            billing_month = '2013-01-01'
+            bill_id = 1
+            customer_id = 1
+
+        )
+
+    new_bill_item.save()
+    print(new_bill_item.id)
+
+    approach 02
+    -----------
+    BillItems.objects.create(
+            bill_no = 'xxxx'
+            billing_month = '2013-01-01'
+            bill_id = 1
+            customer_id = 1
+
+        )
+
+
+# 07 
+To Get A Paginated Response within a APIView
+---------------------------------
+
+check GetUpdatableSIMListBySupplierId API
+
+
+# 08 
+Serializer Behavaiour
+-------------------------
+serializer = StudentSerializer(obj)
+serializer.data <--this is ok
+
+
+
+serializer = StudentSerializer(data = obj)
+serializer.data <--- not gonna work
+
+we have to check:
+serializer.is_valid()
+
+then we can save:
+serializer.save()
+
+
+# 09 
+Common error while importing | import error
+-------------------------------------------
+File "C:\Users\monir\Envs\env-warehouse\lib\site-packages\django\utils\encoding.py", line 64, in force_str
+    s = str(s)
+
+
+solution:
+Add this in the model:
+def __str__(self):
+        return u"{}".format(self.id)
+
+
+
+# 10 
+values & values_list & flat
+--------------------
+values:
+b = Bill.objects.filter(customer = 1).values('id') 
+print(b)
+
+result:
+<QuerySet [{'id': 1}]>
+
+values_list:
+b = Bill.objects.filter(customer = 1).values_list('id') 
+print(b)
+
+result:
+<QuerySet [(1,)]>
+
+values_list with flat param:
+b = Bill.objects.filter(customer=1).values_list('id', flat=True)
+print(list(b)) 
+
+result:
+[1,2]
+
+
+# 10 
+Steps to run celery
+--------------------
+- need to download install erlang, rabbitmq
+- need to pip install celery, rabbitmq, eventlet (in windows evenlet is needed) and pip freeze them in requirements.txt
+- add a file named 'celery.py' (it has to be inside main project folder i.e. wims)and change project name in two positons
+- add codebase in wims' __init__.py file
+- add in the settings.py file:
+    CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//' <-- this is :5672 , not 15672
+- create a tasks.py file anywhere and write the following:
+    @shared_task
+    def celery_printing_func():
+        print("Hellooooooooooooooooooooo!!!Celery Working!!!!!!!!!!!!!!!!!!!!!!!!")      
+        return None
+
+- call this 'celery_printing_func' function from any api with additional .delay()
+    celery_printing_func.delay()
+
+- run command in command prompt: celery -A wims worker -l info -P eventlet
+- as soon as celery server runs, and we hit the api, the rabbitmq will receive the task

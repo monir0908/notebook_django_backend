@@ -12,7 +12,14 @@ DEBUG = os.environ.get('DEBUG')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 
+
 # Other ways of getting env vars
 # DEBUG = os.getenv("DEBUG")
 # SECRET_KEY = os.getenv("SECRET_KEY")
+
+
+STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 ALLOWED_HOSTS = ['*']

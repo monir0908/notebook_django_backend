@@ -11,11 +11,12 @@ DATABASES = {
     }
 }
 
-# To use sqlite3 database
-# --------------------------
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# # To use sqlite3 database
+# # --------------------------
+# # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # from pathlib import Path
 # BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # DATABASES = {
 #     'default': {

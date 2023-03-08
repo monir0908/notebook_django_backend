@@ -36,6 +36,17 @@ class CreateCollectionView(APIView):
     
     def post(self,request):
 
+        data = request.data
+        my_key = "collection_title"
+
+        if not my_key in data.keys():
+            print("'collection_title' key is missing") # my_key is collection_title
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={  
+                "success": False,
+                "state": "warning",
+                "message": "collection_title' key is missing!"
+            }) 
+
         if request.data['collection_title'] is None:
             request.data['collection_title'] = "Untitled"
         request.data['collection_creator'] = self.request.user.id
@@ -56,6 +67,10 @@ class CreateCollectionView(APIView):
 
 # COLLECTION RETRIEVAL
 class CollectionListView(ListAPIView):
+
+    from pathlib import Path
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    print(f"BASE_DIR {BASE_DIR}")
 
     serializer_class = CollectionSerializer
     pagination_class = CustomPagination    
