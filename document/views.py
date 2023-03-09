@@ -18,6 +18,9 @@ from .serializers import (
     DocumentTinySerializer,
     DocumentSerializer,
 )
+from rest_framework.permissions import (
+    IsAuthenticated,
+)
 from base.permissions import (
     IsSuperUser,
     IsStaff, 
@@ -43,7 +46,7 @@ now = timezone.now()
 # DOCUMENT CREATION
 class DocumentCreateView(APIView):
     
-    permission_classes =  (IsActiveMember,) 
+    permission_classes =  (IsAuthenticated,) 
     
     def post(self,request):
 
@@ -168,7 +171,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
     queryset = Document.objects.all()
     serializer_class = CreateDocumentSerializer
     lookup_field = 'doc_key'
-    permission_classes = (IsDocumentOwner, )
+    permission_classes = (IsAuthenticated,)
 
     def patch(self, request, *args, **kwargs):
         existing_obj: Document = self.get_object()
