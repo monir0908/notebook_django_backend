@@ -171,7 +171,7 @@ class UpdateDocumentStatusView(UpdateAPIView):
     queryset = Document.objects.all()
     serializer_class = CreateDocumentSerializer
     lookup_field = 'doc_key'
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsDocumentOwner,)
 
     def patch(self, request, *args, **kwargs):
         existing_obj: Document = self.get_object()
@@ -209,7 +209,7 @@ class UpdateDocumentView(UpdateAPIView):
     queryset = Document.objects.all()
     serializer_class = DocumentUpdateSerializer
     lookup_field = 'doc_key'
-    permission_classes = (IsDocumentOwner, )
+    permission_classes = (IsAuthenticated, )
 
     def patch(self, request, *args, **kwargs):         
         super(UpdateDocumentView, self).patch(request, *args, **kwargs)
