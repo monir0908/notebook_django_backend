@@ -7,8 +7,7 @@ User = get_user_model()
 from collection.models import Collection
 from base.enums import DocumentStatus
 
-# document related
-
+# document model
 class Document(BaseModel):
     collection = models.ForeignKey(
         Collection, models.CASCADE, blank=True, null=True, related_name='documents'
@@ -42,3 +41,20 @@ class Document(BaseModel):
     
     def __str__(self):
         return self.doc_title
+    
+# document attachment model
+class Attachment(BaseModel):
+    document = models.ForeignKey(
+        Document, on_delete=models.CASCADE, related_name='attachments'
+    )
+    file = models.FileField(upload_to='attachments/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'attachment'
+        ordering = ['id']
+        verbose_name = _('attachment')
+        verbose_name_plural = _('attachments')
+
+    def __str__(self):
+        return self.file.name

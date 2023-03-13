@@ -4,7 +4,7 @@ User = get_user_model()
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, status, exceptions
-from .models import Document
+from .models import Document, Attachment
 
 class CreateDocumentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,4 +58,10 @@ class DocumentUpdateSerializer(serializers.ModelSerializer):
             'id',
             'doc_key',
         ]
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attachment
+        fields = ('id', 'document', 'file', 'uploaded_at')
     
