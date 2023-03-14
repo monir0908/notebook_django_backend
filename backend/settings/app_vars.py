@@ -12,7 +12,8 @@ USE_L10N = True
 USE_TZ = True
 APPEND_SLASH = False
 STATIC_URL = '/static/'
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 5MB
+MAX_FILE_SIZE = 1024 * 1024 * 5  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
 # env
 DB_NAME = os.environ.get('DB_NAME')
 DB_USER = os.environ.get('DB_USER')

@@ -6,7 +6,7 @@ LOGGING = {
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'notebook-error.log',
-            'maxBytes': 1024*1024*100,  # 5MB
+            # 'maxBytes': 1024*1024*5,  # 5MB
             'backupCount': 5,
             'level': 'ERROR',
             'formatter': 'standard',

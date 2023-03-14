@@ -11,15 +11,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get('DEBUG')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-
-
 # Other ways of getting env vars
 # DEBUG = os.getenv("DEBUG")
 # SECRET_KEY = os.getenv("SECRET_KEY")
 
+ALLOWED_HOSTS = ['*']
 
 STATIC_URL = '/static/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-ALLOWED_HOSTS = ['*']
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+# Maximum file size in bytes
+MAX_FILE_SIZE = 5 * 1024 * 1024
+
+# List of valid file extensions
+VALID_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.jpg', '.jpeg', '.png', '.gif']
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

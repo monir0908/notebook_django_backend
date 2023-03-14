@@ -8,6 +8,7 @@ from .views import (
     UpdateDocumentView,
     DeleteDocumentView,
     AttachmentUploadView,
+    DeleteAttachmentView,
 )
 
 urlpatterns = [    
@@ -19,4 +20,5 @@ urlpatterns = [
     path('update-doc/<str:doc_key>', UpdateDocumentView.as_view()),
     path('delete-doc/<int:pk>', DeleteDocumentView.as_view()),
     path('upload-attachment/<int:pk>', AttachmentUploadView.as_view()),
+    path('delete-attachment/<int:pk>', DeleteAttachmentView.as_view()),
 ]

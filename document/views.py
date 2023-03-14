@@ -1,16 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from django.http import JsonResponse
 from rest_framework import status
 from base.pagination import CustomPagination
 from .models import Document, Attachment
 from base.enums import DocumentStatus
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 from django.conf import settings
-
-
+from django.core.files.storage import default_storage
 
 from django.db.models import Q
 from django.db.models import Value as V
@@ -23,6 +22,10 @@ from .serializers import (
     DocumentUpdateSerializer,
     DocumentTinySerializer,
     DocumentSerializer,
+    DocumentDetailSerializer,
+)
+from document.serializers import (    
+    AttachmentSerializer,
 )
 from rest_framework.permissions import (
     IsAuthenticated,
@@ -41,13 +44,14 @@ from rest_framework.generics import (
     DestroyAPIView,
 )
 
-
 # from system utils
 import datetime
 date = datetime.date.today()
 
 from django.utils import timezone
 now = timezone.now()
+import os
+
 
 # DOCUMENT CREATION
 class DocumentCreateView(APIView):
@@ -160,8 +164,7 @@ class DocumentListView(ListAPIView):
             queryset.filter(updated_at__range=[start, end])
 
 
-        return queryset
-    
+        return queryset    
 class DocumentListSharedWithMeView(ListAPIView):
 
     serializer_class = DocumentSerializer
@@ -239,11 +242,10 @@ class DocumentListSharedWithMeView(ListAPIView):
 
         return queryset
     
-
 # DOCUMENT DETAIL
 class DocumentDetailView(RetrieveAPIView):
     queryset = Document.objects.all()
-    serializer_class = DocumentSerializer
+    serializer_class = DocumentDetailSerializer
     permission_classes = [IsDocumentOwnerOrPublishedOrArchived, ]
     # lookup_url_kwarg = "pk"
     lookup_field = 'doc_key'
@@ -306,15 +308,23 @@ class UpdateDocumentView(UpdateAPIView):
 # DOCUMENT DELETE
 class DeleteDocumentView(DestroyAPIView):
 
-    # this api is used, in case of deleting from database; 
-    # normally deleteion only updates status; see 'UpdateDocumentStatusView'
-
     serializer_class = DocumentSerializer
     queryset = Document.objects.all()
     # permission_classes = (IsDocumentOwner, )
 
+    def perform_destroy(self, instance):
+        # Delete all the attachments associated with the document
+        for attachment in instance.attachments.all():
+            # Delete the file from the storage
+            default_storage.delete(attachment.file.name)
+            # Delete the Attachment instance
+            attachment.delete()
+        
+        # Delete the document instance
+        instance.delete()
+        
     def delete(self, request, *args, **kwargs):
-        super(DeleteDocumentView, self).delete(request, *args, **kwargs)
+        super().delete(request, *args, **kwargs)
         return JsonResponse(status=status.HTTP_204_NO_CONTENT, data={
             "state": "success",
             "message": "Document deleted...",
@@ -322,66 +332,90 @@ class DeleteDocumentView(DestroyAPIView):
     
 # ATTACHMENTS UPLOAD
 class AttachmentUploadView(APIView):
-    parser_classes = (MultiPartParser, FormParser,)
-    
-
+    parser_classes = (MultiPartParser,)
     def post(self, request, pk, format=None):
-        # document = Document.objects.get(pk=pk)
-        # attachments = self.request.FILES.getlist('files')
-        # attachments = dict((request.data).lists())['files']
-        # attachments = request.FILES['files']
-        print(request.user)
-        return JsonResponse(status=status.HTTP_200_OK, data={
-            "state": "test",
-            "message": "test"
-        })
+        document = Document.objects.get(pk=pk)
+        
+        try:
+            document = Document.objects.get(pk=document.pk)
+        except Document.DoesNotExist:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
+                "state": "error",
+                "message": "Invalid document ID."
+            })
 
-
+        attachments = request.FILES.getlist("files")
 
         if not attachments:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
                 "state": "warning",
                 "message": "No files were attached; please attach file(s)."
             })
-        MAX_BYTES = settings.LOGGING['handlers']['file']['maxBytes']
-        
 
         # Check file sizes
-        too_large_files = [f.name for f in attachments if f.size > MAX_BYTES]
+        too_large_files = [f.name for f in attachments if f.size > settings.MAX_FILE_SIZE]
+
         if too_large_files:
+            num_files = len(too_large_files)
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
                 "state": "warning",
-                "message": f"The following files are > 5MB: {', '.join(too_large_files)}"
+                "message": f"The following {num_files} {'file is' if num_files == 1 else 'files are'} greater than 5MB: {', '.join(too_large_files)}"
             })
 
-        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
-            "state": "test",
-            "message": "test"
+        successful_uploads = 0
+        failed_uploads = []
+        for file in attachments:
+            try:
+                with transaction.atomic():
+                    sid = transaction.savepoint()
+
+                    Attachment.objects.create(document=document, file=file)
+                    successful_uploads += 1
+            except Exception as e:
+                transaction.savepoint_rollback(sid)
+                # saving the exception in 'notebook-error.log' file for future investigation
+                logging.error(str(e))
+                failed_uploads.append(file.name)
+
+        if successful_uploads > 0:
+            if failed_uploads:
+                num_failed_uploads = len(failed_uploads)
+                return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
+                    "state": "warning",
+                    "message": f"{successful_uploads}/{len(attachments)} file{'s' if successful_uploads > 1 else ''} uploaded successfully. {num_failed_uploads} {'file' if num_failed_uploads == 1 else 'files'} failed: {', '.join(failed_uploads)}."
+                })
+            else:
+                return JsonResponse(status=status.HTTP_200_OK, data={
+                    "state": "success",
+                    "message": f"{successful_uploads}/{len(attachments)} file{'s' if successful_uploads > 1 else ''} uploaded successfully.",
+                })
+        else:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
+                "state": "error",
+                "message": "Error uploading attachments!!",
+            })
+
+# ATTACHMENTS DELETE        
+class DeleteAttachmentView(DestroyAPIView):
+    serializer_class = AttachmentSerializer
+    queryset = Attachment.objects.all()
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            attachment = self.get_object()
+        except NotFound:
+            return JsonResponse(status=status.HTTP_404_NOT_FOUND, data={
+                "state": "error",
+                "message": "Attachment not found",
+            })
+
+        try:
+            file_path = attachment.file.path
+            super().delete(request, *args, **kwargs)            
+            os.remove(file_path)
+        except (OSError, FileNotFoundError):
+            raise NotFound("Attachment not found or could not be deleted.")
+        return JsonResponse(status=status.HTTP_204_NO_CONTENT, data={
+            "state": "success",
+            "message": "Attachment deleted...",
         })
-        
-        
-        # successful_uploads = 0
-        # for file in attachments:
-        #     try:
-        #         with transaction.atomic():
-        #             sid = transaction.savepoint()
-
-        #             Attachment.objects.create(document=document, file=file)
-        #             successful_uploads += 1
-        #     except Exception as e:
-        #         transaction.savepoint_rollback(sid)
-        #         # saving the exception in notebook-error.log file for future investigation
-        #         logging.error(str(e))
-        #     continue
-        
-        # if successful_uploads > 0:
-        #     return JsonResponse(status=status.HTTP_200_OK, data={
-        #         "state": "success",
-        #         "message": f"{successful_uploads}/ {len(attachments)} file{'s' if successful_uploads > 1 else ''} uploaded successfully",
-        #     })
-        # else:
-        #     return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
-        #         "state": "error",
-        #         "message": "Error uploading attachments!!",
-        #     })
-
