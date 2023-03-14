@@ -5,6 +5,9 @@ from .enums import GenderTypes
 from base.models import NameBaseModel
 from .managers import UserManager
 
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+
 class User(AbstractBaseUser, PermissionsMixin, NameBaseModel):       
     
     # email will be considered as username, password will automatically be mandatory
@@ -33,6 +36,13 @@ class User(AbstractBaseUser, PermissionsMixin, NameBaseModel):
     date_joined = models.DateTimeField(auto_now_add=True)
        
     #... ... first_name, last_name, slug coming from NameBaseModel
+
+    profile_pic = models.ImageField(upload_to='profile_pics', blank=True, null=True)
+    profile_pic_thumbnail = ImageSpecField(
+        source='profile_pic',
+        processors=[ResizeToFill(34, 34)],
+        format='JPEG',
+        options={'quality': 85})
     
     
     objects = UserManager()

@@ -10,8 +10,21 @@ from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, status, exceptions
 from base.helpers import generate_user_code
+from django.conf import settings
+from django.templatetags.static import static
+
+from pathlib import Path
+
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, TokenObtainSerializer):
+
+    def get_profile_pic_url(self, user):
+        if user.profile_pic:
+            return self.context['request'].build_absolute_uri(self.user.profile_pic.url)
+        else:
+            # Return a default profile picture URL or a placeholder image URL
+            return self.context['request'].build_absolute_uri(static('default_images/avatar.png'))
+            return "https://trello-members.s3.amazonaws.com/63cf43cec74fb1aa9b684de0/783f74cf34e7bdf05e5e6d61f0887fb7/30.png"
     
   
     # Overiding validate function in the TokenObtainSerializer  
@@ -98,6 +111,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, TokenObtainSeri
         data['is_active'] = self.user.is_active
         data['is_staff'] = self.user.is_staff
         data['is_superuser'] = self.user.is_superuser
+        data['profile_pic'] = self.get_profile_pic_url(self.user)
+
+        # # Add profile_pic field to the response data
+        # if self.user.profile_pic:
+        #     profile_pic_url = self.context['request'].build_absolute_uri(self.user.profile_pic.url)
+        #     data['profile_pic'] = profile_pic_url
         # data['groups'] = self.user.groups.values_list('name', flat=True) <--Encounter Error:  TypeError: Object of type QuerySet is not JSON serializable
         return data
 
@@ -126,4 +145,17 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         # Saving user model
         user.save()       
         return user
-    
+
+
+class ProfilePicUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('profile_pic',)
+        read_only_fields = ('profile_pic_thumbnail',)
+
+    def update(self, instance, validated_data):
+        profile_pic = validated_data.get('profile_pic')
+        if profile_pic:
+            instance.profile_pic = profile_pic
+            instance.save()
+        return instance

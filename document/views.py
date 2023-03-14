@@ -330,14 +330,14 @@ class DeleteDocumentView(DestroyAPIView):
             "message": "Document deleted...",
         })
     
-# ATTACHMENTS UPLOAD
+# ATTACHMENT UPLOAD
 class AttachmentUploadView(APIView):
     parser_classes = (MultiPartParser,)
-    def post(self, request, pk, format=None):
-        document = Document.objects.get(pk=pk)
-        
+    def post(self, request, pk, format=None):           
+
+        # this try catch block not catching exception
         try:
-            document = Document.objects.get(pk=document.pk)
+            document = Document.objects.get(pk=pk) # document id as pk
         except Document.DoesNotExist:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
                 "state": "error",
@@ -395,7 +395,7 @@ class AttachmentUploadView(APIView):
                 "message": "Error uploading attachments!!",
             })
 
-# ATTACHMENTS DELETE        
+# ATTACHMENT DELETE        
 class DeleteAttachmentView(DestroyAPIView):
     serializer_class = AttachmentSerializer
     queryset = Attachment.objects.all()
