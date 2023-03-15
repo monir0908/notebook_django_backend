@@ -19,7 +19,6 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from backend.views import health_check
 
-
 urlpatterns = [
     path('', health_check),    
     path('admin', admin.site.urls),

@@ -33,10 +33,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Maximum file size in bytes
 MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # List of valid file extensions
 VALID_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.jpg', '.jpeg', '.png', '.gif']
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
