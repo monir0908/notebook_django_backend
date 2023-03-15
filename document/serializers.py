@@ -69,6 +69,8 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
         ]
 
 class DocumentTinySerializer(serializers.ModelSerializer):
+    doc_creator_id = serializers.IntegerField(source='doc_creator.id', read_only=True)
+    doc_creator_full_name = serializers.CharField(source='doc_creator.get_full_name', read_only=True)
     class Meta:
         model = Document
         fields = [
@@ -77,6 +79,8 @@ class DocumentTinySerializer(serializers.ModelSerializer):
             'doc_title',
             'doc_body',
             'doc_status',
+            'doc_creator_id',
+            'doc_creator_full_name',
         ]
 
 class DocumentUpdateSerializer(serializers.ModelSerializer):

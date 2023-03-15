@@ -119,7 +119,8 @@ class DocumentListView(ListAPIView):
         if search_param is not None and creator_id is not None:            
             queryset = queryset.filter(
                 Q(doc_title__icontains=search_param) |
-                Q(doc_body__icontains=search_param),
+                Q(doc_body__icontains=search_param) |
+                Q(collection__collection_title__icontains=search_param),
                 Q(doc_creator = creator_id)
             )
         
