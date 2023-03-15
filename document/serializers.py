@@ -22,6 +22,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     collection_title = serializers.CharField(source='collection.collection_title', read_only=True)
     collection_key = serializers.CharField(source='collection.collection_key', read_only=True)
+    doc_creator_id = serializers.IntegerField(source='doc_creator.id', read_only=True)
     doc_creator_full_name = serializers.CharField(source='doc_creator.get_full_name', read_only=True)
 
     class Meta:
@@ -31,6 +32,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             'doc_key',
             'doc_title',
             'doc_body',
+            'doc_creator_id',
             'doc_creator_full_name',
             'doc_status',
             'created_at',
@@ -44,6 +46,7 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
 
     collection_title = serializers.CharField(source='collection.collection_title', read_only=True)
     collection_key = serializers.CharField(source='collection.collection_key', read_only=True)
+    doc_creator_id = serializers.IntegerField(source='doc_creator.id', read_only=True)
     doc_creator_full_name = serializers.CharField(source='doc_creator.get_full_name', read_only=True)
     attachments = AttachmentSerializer(many=True, read_only=True)
 
@@ -54,6 +57,7 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
             'doc_key',
             'doc_title',
             'doc_body',
+            'doc_creator_id',
             'doc_creator_full_name',
             'doc_status',
             'created_at',
