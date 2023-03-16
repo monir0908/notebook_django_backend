@@ -101,7 +101,7 @@ class ProfileUpdateAPIView(UpdateAPIView):
         # return updated fields in response
         data = {
             "state": "success",
-            "message": "Profile updated.",
+            "message": "Profile updated..",
             "first_name": serializer.data.get('first_name', instance.first_name),
             "last_name": serializer.data.get('last_name', instance.last_name)
         }
