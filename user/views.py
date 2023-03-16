@@ -4,12 +4,14 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import UpdateAPIView
 from django.contrib.auth import get_user_model 
 User = get_user_model() 
 from .serializers import (
     CustomTokenObtainPairSerializer,
     UserSignUpSerializer,
     ProfilePicUpdateSerializer,
+    ProfileUpdateSerializer,
 )
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -74,3 +76,34 @@ class ProfilePicUpdateView(APIView):
                 "profile_pic": profile_pic_url,
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ProfileUpdateAPIView(UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = ProfileUpdateSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
+
+    def put(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+        except User.DoesNotExist:
+            return Response(data={'state': 'error', 'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        
+        try:
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+        except Exception as e:
+            return Response(data={'state': 'error', 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # return updated fields in response
+        data = {
+            "state": "success",
+            "message": "Profile updated.",
+            "first_name": serializer.data.get('first_name', instance.first_name),
+            "last_name": serializer.data.get('last_name', instance.last_name)
+        }
+
+        return Response(data=data, status=status.HTTP_200_OK)

@@ -159,3 +159,14 @@ class ProfilePicUpdateSerializer(serializers.ModelSerializer):
             instance.profile_pic = profile_pic
             instance.save()
         return instance
+    
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name',)
+
+    def validate_first_name(self, value):
+        if len(value) < 2:
+            raise serializers.ValidationError("First name must be at least 2 characters long.")
+        return value
