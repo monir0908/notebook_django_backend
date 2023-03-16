@@ -63,12 +63,13 @@ class ProfilePicUpdateView(APIView):
             # Save new profile pic
             image_data = request.FILES.get('profile_pic')
             if image_data:
-                filename = f"{user.id}_profile_pic.{image_data.name.split('.')[-1]}"
-                filepath = default_storage.save(os.path.join(settings.MEDIA_ROOT, filename), ContentFile(image_data.read()))
+                filename = f"{user.id}_{user.first_name}.{image_data.name.split('.')[-1]}"
+                filepath = default_storage.save(os.path.join('profile_pics', filename), ContentFile(image_data.read()))
+                print(os.path.join(settings.MEDIA_ROOT, filename))
                 user.profile_pic = filepath
             user.save()
             # Get full URL for profile pic
-            profile_pic_url = request.build_absolute_uri(user.profile_pic.url)
+            profile_pic_url = request.build_absolute_uri(user.profile_pic_thumbnail.url)
             
             return JsonResponse(status=status.HTTP_200_OK, data={    
                 "state": "success",

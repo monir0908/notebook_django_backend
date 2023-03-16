@@ -40,9 +40,9 @@ class User(AbstractBaseUser, PermissionsMixin, NameBaseModel):
     profile_pic = models.ImageField(upload_to='profile_pics', blank=True, null=True)
     profile_pic_thumbnail = ImageSpecField(
         source='profile_pic',
-        processors=[ResizeToFill(34, 34)],
+        processors=[ResizeToFill(64, 64)],
         format='JPEG',
-        options={'quality': 85})
+        options={'quality': 85})   
     
     
     objects = UserManager()

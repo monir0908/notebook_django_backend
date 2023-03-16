@@ -20,7 +20,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, TokenObtainSeri
 
     def get_profile_pic_url(self, user):
         if user.profile_pic:
-            return self.context['request'].build_absolute_uri(self.user.profile_pic.url)
+            return self.context['request'].build_absolute_uri(self.user.profile_pic_thumbnail.url)
         else:
             # Return a default profile picture URL or a placeholder image URL
             return self.context['request'].build_absolute_uri(static('default_images/avatar.png'))
