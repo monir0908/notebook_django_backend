@@ -14,12 +14,12 @@ from django.conf import settings
 from django.templatetags.static import static
 
 from pathlib import Path
-
-
+import os
+from django.conf import settings
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, TokenObtainSerializer):
 
     def get_profile_pic_url(self, user):
-        if user.profile_pic:
+        if os.path.isdir(os.path.join(settings.MEDIA_ROOT, 'profile_pics')) and user.profile_pic:
             return self.context['request'].build_absolute_uri(self.user.profile_pic_thumbnail.url)
         else:
             # Return a default profile picture URL or a placeholder image URL

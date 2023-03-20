@@ -58,18 +58,39 @@ class ProfilePicUpdateView(APIView):
         serializer = ProfilePicUpdateSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             # Delete old profile pic if it exists
-            if user.profile_pic:
-                default_storage.delete(user.profile_pic.path)
+            # old_pic = None
+            # print("=============1================")
+            # print(f"user.profile_pic {user.profile_pic}")
+            # print("=============================")
+            # if user.profile_pic:
+            #     old_pic = user.profile_pic.path
+            #     old_pic_cache = user.profile_pic_thumbnail.path
+            #     print("============2=================")
+            #     print(f"OLD PIC PATH: {old_pic}")
+            #     print(f"OLD PIC CACHE PATH: {old_pic_cache}")
+            #     print("=============================")
+                
             # Save new profile pic
             image_data = request.FILES.get('profile_pic')
             if image_data:
                 filename = f"{user.id}_{user.first_name}.{image_data.name.split('.')[-1]}"
                 filepath = default_storage.save(os.path.join('profile_pics', filename), ContentFile(image_data.read()))
-                print(os.path.join(settings.MEDIA_ROOT, filename))
+                print("==============3===============")
+                print(f"NEW IMAGE SAVBING PATH: {filepath}")
+                print("=============================")
                 user.profile_pic = filepath
             user.save()
             # Get full URL for profile pic
+            print(user.profile_pic.url)
             profile_pic_url = request.build_absolute_uri(user.profile_pic_thumbnail.url)
+
+            # if old_pic:               
+            #     default_storage.delete(old_pic)
+            #     default_storage.delete(old_pic_cache)
+            #     print("==============4===============")
+            #     print(f"DELETED IMAGE PATH: {old_pic}")
+            #     print(f"DELETED IMAGE CACHE PATH: {old_pic_cache}")
+            #     print("=============================")
             
             return JsonResponse(status=status.HTTP_200_OK, data={    
                 "state": "success",
