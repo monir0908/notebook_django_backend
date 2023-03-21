@@ -5,12 +5,21 @@ User = get_user_model()
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, status, exceptions
 from .models import Document, Attachment
-
-
+import os
+from urllib.parse import urlparse
 class AttachmentSerializer(serializers.ModelSerializer):
+    file_name = serializers.SerializerMethodField()
+    file_extension = serializers.SerializerMethodField()
+    
     class Meta:
         model = Attachment
-        fields = ('id', 'document', 'file', 'uploaded_at')
+        fields = ('id', 'document', 'file', 'uploaded_at', 'file_name', 'file_extension')
+    
+    def get_file_name(self, obj):
+        return os.path.basename(urlparse(obj.file.name).path)
+
+    def get_file_extension(self, obj):
+        return os.path.splitext(obj.file.name)[1]
     
 
 class CreateDocumentSerializer(serializers.ModelSerializer):
