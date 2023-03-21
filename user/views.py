@@ -1,6 +1,8 @@
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.core.exceptions import ValidationError
+from django.http import Http404
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -16,16 +18,17 @@ from .serializers import (
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.password_validation import validate_password
 import os
+from base.utils import send_email
 
 
-
-# USER LOGIN
+# USER VIEWS
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-
-# USER REGISTRATION
 class SignUpView(APIView):
     
     def post(self,request):
@@ -36,19 +39,58 @@ class SignUpView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             
-            ## sending email to user
-            # user = User(
-            #     email = serializer.data['email'],
-            #     first_name = serializer.data['first_name'],
-            #     last_name = serializer.data['last_name']                
-            # )
-            # send_email(user)
+            # sending email to user
+            user = User(
+                email = serializer.data['email'],
+                first_name = serializer.data['first_name'],
+                last_name = serializer.data['last_name']                
+            )
+            send_email(user)
 
             return JsonResponse(status=status.HTTP_201_CREATED, data={    
                 "success": True,
                 "state": "success",
                 "message": "Registration successful!",
             })
+        
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+# class SignUpView(APIView):
+
+#     @receiver(post_save, sender=User)
+#     def send_registration_email(sender, instance, created, **kwargs):
+#         if created:
+#             try:
+#                 send_email(instance)
+#             except Exception as e:
+#                 # Handle email sending error
+#                 return JsonResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={
+#                     "success": False,
+#                     "state": "failure",
+#                     "message": "Failed to send registration email. Please contact support for assistance."
+#                 })
+
+#     def post(self,request):
+#         request.data['is_active'] = True
+
+#         serializer = UserSignUpSerializer(data = request.data)
+
+#         if serializer.is_valid(raise_exception=True):
+#             user = serializer.save()
+            
+#             return JsonResponse(status=status.HTTP_201_CREATED, data={    
+#                 "success": True,
+#                 "state": "success",
+#                 "message": "Registration successful!",
+#             })
+
+#         return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
+#             "success": False,
+#             "state": "failure",
+#             "message": "Failed to create user account. Please try again later."
+#         })
+
 
 class ProfilePicUpdateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -97,8 +139,7 @@ class ProfilePicUpdateView(APIView):
                 "message": "profile pic uploaded..",
                 "profile_pic": profile_pic_url,
             })
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
 class ProfileUpdateAPIView(UpdateAPIView):
     queryset = User.objects.all()
@@ -106,26 +147,68 @@ class ProfileUpdateAPIView(UpdateAPIView):
     permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):       
+
         try:
             instance = self.get_object()
-        except User.DoesNotExist:
-            return Response(data={'state': 'error', 'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-
+        except Http404:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
+                "state": "warning",
+                "message": "Invalid user ID."
+            })
         
         try:
             serializer = self.get_serializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
         except Exception as e:
-            return Response(data={'state': 'error', 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
+                "state": "error",
+                "message": str(e)
+            })            
 
         # return updated fields in response
-        data = {
+        return JsonResponse(status=status.HTTP_200_OK, data={
             "state": "success",
             "message": "Profile updated..",
             "first_name": serializer.data.get('first_name', instance.first_name),
             "last_name": serializer.data.get('last_name', instance.last_name)
-        }
+        })  
 
-        return Response(data=data, status=status.HTTP_200_OK)
+class PasswordChangeAPIView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):   # The Django UpdateAPIView maps to the HTTP PUT method by default.
+        user = self.get_object()
+        old_password = request.data.get('old_password', None)
+        new_password = request.data.get('new_password', None)
+
+        if not old_password or not new_password:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={    
+                "state": "warning",
+                "message": "Both old password and new password fields are required.",
+            })
+
+        if not check_password(old_password, user.password):
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={    
+                "state": "warning",
+                "message": "Invalid old password.",
+            })
+
+        try:
+            validate_password(new_password, user)
+        except ValidationError as e:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={    
+                "state": "warning",
+                "message": f"Passwords validation failed. {e.messages}",
+            })            
+
+        user.set_password(new_password)
+        user.save()
+        return JsonResponse(status=status.HTTP_200_OK, data={    
+            "state": "success",
+            "message": "Password successfully updated...",
+        })

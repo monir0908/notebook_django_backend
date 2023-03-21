@@ -4,6 +4,7 @@ from .views import (
     SignUpView,
     ProfilePicUpdateView,
     ProfileUpdateAPIView,
+    PasswordChangeAPIView,
 )
 
 urlpatterns = [
@@ -12,4 +13,5 @@ urlpatterns = [
     path('signup', SignUpView.as_view()),
     path('update-profile-pic/<int:pk>', ProfilePicUpdateView.as_view(), name='update-profile-pic'),
     path('update-profile/<int:pk>', ProfileUpdateAPIView.as_view(), name='profile-update'),
+    path('change-password', PasswordChangeAPIView.as_view()),
 ]

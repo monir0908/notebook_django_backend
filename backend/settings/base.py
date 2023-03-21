@@ -41,3 +41,29 @@ MAX_FILE_SIZE = 5 * 1024 * 1024
 # List of valid file extensions
 VALID_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.jpg', '.jpeg', '.png', '.gif']
 
+# EMAIL SETTINGS
+FRONTEND_URL = os.environ.get('FRONTEND_URL')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'monir.mystic@gmail.com'
+EMAIL_HOST_PASSWORD = 'phkzhfxzwoetuuac'
+EMAIL_USE_TLS = True
+
+
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates') # as settings is a folder (not a file) and all its files reside under settings folder
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [TEMPLATES_DIR],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
