@@ -222,7 +222,7 @@ class PasswordChangeAPIView(UpdateAPIView):
             })
 
         if not check_password(old_password, user.password):
-            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={    
+            return JsonResponse(status=status.HTTP_422_UNPROCESSABLE_ENTITY, data={    
                 "state": "warning",
                 "message": "Invalid old password.",
             })
