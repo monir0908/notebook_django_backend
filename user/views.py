@@ -210,7 +210,7 @@ class PasswordChangeAPIView(UpdateAPIView):
     def get_object(self):
         return self.request.user
 
-    def update(self, request, *args, **kwargs):   # The Django UpdateAPIView maps to the HTTP PUT method by default.
+    def put(self, request, *args, **kwargs):   # The Django UpdateAPIView maps to the HTTP PUT method by default.
         user = self.get_object()
         old_password = request.data.get('old_password', None)
         new_password = request.data.get('new_password', None)
