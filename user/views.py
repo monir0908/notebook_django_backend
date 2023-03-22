@@ -103,7 +103,7 @@ class SignUpView(APIView):
                 """
             except Exception as e:
                 return JsonResponse(status=status.HTTP_200_OK, data={    
-                    "state": "error",
+                    "state": "success",
                     "message": "Sign up successful! However, failed to send welcome email. Error: {}".format(str(e))
                 })
             else:
