@@ -102,7 +102,7 @@ class SignUpView(APIView):
                 exception even if the email address is wrong (e.g. monir@fakefake.com)
                 """
             except Exception as e:
-                return JsonResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={    
+                return JsonResponse(status=status.HTTP_200_OK, data={    
                     "state": "error",
                     "message": "Sign up successful! However, failed to send welcome email. Error: {}".format(str(e))
                 })
