@@ -29,48 +29,32 @@ from base.utils import send_email
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-class SignUpView(APIView):
+# class SignUpView(APIView):
     
-    def post(self,request):
-        request.data['is_active'] = True
+#     def post(self,request):
+#         request.data['is_active'] = True
 
-        serializer = UserSignUpSerializer(data = request.data)
+#         serializer = UserSignUpSerializer(data = request.data)
 
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
             
-            # sending email to user
-            user = User(
-                email = serializer.data['email'],
-                first_name = serializer.data['first_name'],
-                last_name = serializer.data['last_name']                
-            )
-            send_email(user)
+#             # sending email to user
+#             user = User(
+#                 email = serializer.data['email'],
+#                 first_name = serializer.data['first_name'],
+#                 last_name = serializer.data['last_name']                
+#             )
+#             send_email(user)
 
-            return JsonResponse(status=status.HTTP_201_CREATED, data={    
-                "success": True,
-                "state": "success",
-                "message": "Registration successful!",
-            })
+#             return JsonResponse(status=status.HTTP_201_CREATED, data={    
+#                 "success": True,
+#                 "state": "success",
+#                 "message": "Registration successful!",
+#             })
         
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 # class SignUpView(APIView):
-
-#     @receiver(post_save, sender=User)
-#     def send_registration_email(sender, instance, created, **kwargs):
-#         if created:
-#             try:
-#                 send_email(instance)
-#             except Exception as e:
-#                 # Handle email sending error
-#                 return JsonResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={
-#                     "success": False,
-#                     "state": "failure",
-#                     "message": "Failed to send registration email. Please contact support for assistance."
-#                 })
-
 #     def post(self,request):
 #         request.data['is_active'] = True
 
@@ -79,17 +63,62 @@ from django.dispatch import receiver
 #         if serializer.is_valid(raise_exception=True):
 #             user = serializer.save()
             
-#             return JsonResponse(status=status.HTTP_201_CREATED, data={    
-#                 "success": True,
-#                 "state": "success",
-#                 "message": "Registration successful!",
-#             })
+#             try:
+#                 send_email(user)
+#             except EmailSendingError:
+#                 return JsonResponse(status=status.HTTP_201_CREATED, data={    
+#                     "state": "success",
+#                     "message": "Registration successful! However, we were unable to send a welcome email to your email address.",
+#                 })
+#             else:
+#                 return JsonResponse(status=status.HTTP_201_CREATED, data={    
+#                     "state": "success",
+#                     "message": "Registration successful! Check your email for further instructions.",
+#                 })
 
 #         return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
 #             "success": False,
 #             "state": "failure",
 #             "message": "Failed to create user account. Please try again later."
 #         })
+
+
+class SignUpView(APIView):
+    def post(self,request):
+        request.data['is_active'] = True
+
+        serializer = UserSignUpSerializer(data = request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
+            
+            try:
+                send_email(user)  # did not use post_save as unable to catch exceptions from post_save
+                """
+                SMTP does not perform email address validation during email sending. It simply sends 
+                the email to the specified address without verifying if the email address actually exists or not. 
+                The email server at the recipient's end may later reject the email if the address does not exist, 
+                or if it is invalid for some other reason. Therefore, SMTP does not throw an 
+                exception even if the email address is wrong (e.g. monir@fakefake.com)
+                """
+            except Exception as e:
+                return JsonResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={    
+                    "state": "error",
+                    "message": "Sign up successful! However, failed to send welcome email. Error: {}".format(str(e))
+                })
+            else:
+                return JsonResponse(status=status.HTTP_200_OK, data={    
+                    "state": "success",
+                    "message": "Sign up successful! Check your email for further instructions.",
+                })
+
+        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
+            "success": False,
+            "state": "failure",
+            "message": "Failed to create user account. Please try again later."
+        })
+
+
 
 
 class ProfilePicUpdateView(APIView):

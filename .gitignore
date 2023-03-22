@@ -175,3 +175,8 @@ RnD/
 .vscode
 dev.env
 deployments
+
+# static
+media/
+static/
+staticfiles/
