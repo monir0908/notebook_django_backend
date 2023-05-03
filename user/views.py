@@ -30,60 +30,6 @@ from collection.serializers import CreateCollectionSerializer
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-# class SignUpView(APIView):
-    
-#     def post(self,request):
-#         request.data['is_active'] = True
-
-#         serializer = UserSignUpSerializer(data = request.data)
-
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save()
-            
-#             # sending email to user
-#             user = User(
-#                 email = serializer.data['email'],
-#                 first_name = serializer.data['first_name'],
-#                 last_name = serializer.data['last_name']                
-#             )
-#             send_email(user)
-
-#             return JsonResponse(status=status.HTTP_201_CREATED, data={    
-#                 "success": True,
-#                 "state": "success",
-#                 "message": "Registration successful!",
-#             })
-        
-
-# class SignUpView(APIView):
-#     def post(self,request):
-#         request.data['is_active'] = True
-
-#         serializer = UserSignUpSerializer(data = request.data)
-
-#         if serializer.is_valid(raise_exception=True):
-#             user = serializer.save()
-            
-#             try:
-#                 send_email(user)
-#             except EmailSendingError:
-#                 return JsonResponse(status=status.HTTP_201_CREATED, data={    
-#                     "state": "success",
-#                     "message": "Registration successful! However, we were unable to send a welcome email to your email address.",
-#                 })
-#             else:
-#                 return JsonResponse(status=status.HTTP_201_CREATED, data={    
-#                     "state": "success",
-#                     "message": "Registration successful! Check your email for further instructions.",
-#                 })
-
-#         return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={
-#             "success": False,
-#             "state": "failure",
-#             "message": "Failed to create user account. Please try again later."
-#         })
-
-
 class SignUpView(APIView):
     def post(self,request):
         request.data['is_active'] = True
@@ -131,29 +77,13 @@ class SignUpView(APIView):
             "message": "Failed to create user account. Please try again later."
         })
 
-
-
-
 class ProfilePicUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         user = User.objects.get(pk=pk)
         serializer = ProfilePicUpdateSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            # Delete old profile pic if it exists
-            # old_pic = None
-            # print("=============1================")
-            # print(f"user.profile_pic {user.profile_pic}")
-            # print("=============================")
-            # if user.profile_pic:
-            #     old_pic = user.profile_pic.path
-            #     old_pic_cache = user.profile_pic_thumbnail.path
-            #     print("============2=================")
-            #     print(f"OLD PIC PATH: {old_pic}")
-            #     print(f"OLD PIC CACHE PATH: {old_pic_cache}")
-            #     print("=============================")
-                
+        if serializer.is_valid():                
             # Save new profile pic
             image_data = request.FILES.get('profile_pic')
             if image_data:
@@ -167,14 +97,6 @@ class ProfilePicUpdateView(APIView):
             # Get full URL for profile pic
             print(user.profile_pic.url)
             profile_pic_url = request.build_absolute_uri(user.profile_pic_thumbnail.url)
-
-            # if old_pic:               
-            #     default_storage.delete(old_pic)
-            #     default_storage.delete(old_pic_cache)
-            #     print("==============4===============")
-            #     print(f"DELETED IMAGE PATH: {old_pic}")
-            #     print(f"DELETED IMAGE CACHE PATH: {old_pic_cache}")
-            #     print("=============================")
             
             return JsonResponse(status=status.HTTP_200_OK, data={    
                 "state": "success",
