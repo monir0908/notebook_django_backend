@@ -2,6 +2,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, APIException
 from django.http import Http404
 from django.http import JsonResponse
 from rest_framework import status
@@ -23,7 +24,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 import os
 from base.utils import send_email
-
+from collection.serializers import CreateCollectionSerializer
 
 # USER VIEWS
 class LoginView(TokenObtainPairView):
@@ -86,6 +87,7 @@ class LoginView(TokenObtainPairView):
 class SignUpView(APIView):
     def post(self,request):
         request.data['is_active'] = True
+        
 
         serializer = UserSignUpSerializer(data = request.data)
 
@@ -93,6 +95,17 @@ class SignUpView(APIView):
             user = serializer.save()
             
             try:
+                # creating a sample collection as default
+                request.data['collection_title'] = None
+                request.data['collection_creator'] = None            
+                
+
+                serializer = CreateCollectionSerializer(data = request.data)
+
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                
+                # sending an welcome email
                 send_email(user)  # did not use post_save as unable to catch exceptions from post_save
                 """
                 SMTP does not perform email address validation during email sending. It simply sends 
@@ -104,7 +117,7 @@ class SignUpView(APIView):
             except Exception as e:
                 return JsonResponse(status=status.HTTP_200_OK, data={    
                     "state": "success",
-                    "message": "Sign up successful! However, failed to send welcome email. Error: {}".format(str(e))
+                    "message": "Sign up successful! However, failed to send welcome email or create sample collection; Error: {}".format(str(e))
                 })
             else:
                 return JsonResponse(status=status.HTTP_200_OK, data={    
