@@ -96,8 +96,8 @@ class SignUpView(APIView):
             
             try:
                 # creating a sample collection as default
-                request.data['collection_title'] = None
-                request.data['collection_creator'] = None            
+                request.data['collection_title'] = "Sample"
+                request.data['collection_creator'] = request.user.id        
                 
 
                 serializer = CreateCollectionSerializer(data = request.data)
